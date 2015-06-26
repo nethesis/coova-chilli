@@ -27,6 +27,7 @@
 #ifdef ENABLE_EWTAPI
 #include "ewt.h"
 #endif
+#include "json/json.h"
 
 #ifndef __error_t_defined
 typedef int error_t;
@@ -1344,9 +1345,12 @@ static int redir_json_reply(struct redir_t *redir, int res, struct redir_conn_t 
   bconcat(json, tmp);
 
   if (reply) {
-    bcatcstr(json, ",\"message\":\"");
-    bcatcstr(json, reply);
-    bcatcstr(json, "\"");
+    struct json_object* reply_json_obj;
+    reply_json_obj = json_object_new_string(reply);
+
+    bcatcstr(json, ",\"message\":");
+    bcatcstr(json, json_object_to_json_string(reply_json_obj));
+    json_object_put(reply_json_obj);
   }
 
   if ((flg & FLG_chlg) && hexchal) {

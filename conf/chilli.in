@@ -47,6 +47,10 @@ start() {
 
     check_required
 
+    ping -c 1 www.google.it -W 5 > /dev/null 2> /dev/null
+    retval=$?
+    [ $retval -eq 0 ] || return $retval
+
     /sbin/modprobe tun >/dev/null 2>&1
     echo 1 > /proc/sys/net/ipv4/ip_forward
 

@@ -1,6 +1,6 @@
 Summary:   Coova-Chilli is a Wireless LAN Access Point Controller
 Name:      coova-chilli
-Version: 1.3.1.4
+Version: 1.3.1.5
 Release: 1%{?dist}
 URL:       http://www.coova.org/
 Source0:   %{name}-%{version}.tar.gz
@@ -92,6 +92,9 @@ fi
 %{_mandir}/man8/*.8*
 
 %changelog
+* Tue Mar 15 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.3.1.5-1
+- CoovaChilli does not start at init - Bug #3364 [NethServer]
+
 * Mon Nov 23 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.3.1.4-1
 - Do not hang if configured with external dns and network is down. Bug #3315
 

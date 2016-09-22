@@ -47,6 +47,19 @@ start() {
 
     check_required
 
+    #Start hotspot service ONLY if connectivity is present. Worst case: 15 seconds to wait
+    attempts=0
+    retval=1
+    while [ $retval -ne 0 ] && [ $attempts -lt 15 ]
+    do
+      ping -c 1 www.google.it > /dev/null 2> /dev/null
+      retval=$?
+      [ $retval -eq 0 ] && break
+      ((attempts++))
+      sleep 1
+    done
+    [ $retval -eq 0 ] || return $retval
+
     /sbin/modprobe tun >/dev/null 2>&1
     echo 1 > /proc/sys/net/ipv4/ip_forward
 

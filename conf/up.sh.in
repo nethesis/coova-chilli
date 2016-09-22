@@ -93,6 +93,10 @@ run_up() {
 
     # site specific stuff optional
     [ -e @ETCCHILLI@/ipup.sh ] && . @ETCCHILLI@/ipup.sh
+
+	# Change by Lux. TODO: see if MASQUERADE is still necessary, or put it into chilli.iptables script?
+    [ -e "@VARRUN@/chilli.iptables" ] && sh @VARRUN@/chilli.iptables 2>/dev/null
+    iptables -I POSTROUTING -t nat -o $HS_WANIF -j MASQUERADE
 }
 
 

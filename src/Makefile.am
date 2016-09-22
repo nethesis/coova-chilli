@@ -51,6 +51,11 @@ if WITH_PATRICIA
 libchilli_la_SOURCES += patricia.c patricia.h
 endif
 
+if WITH_JSON
+libchilli_la_LIBADD += ${LIBJSON}
+LDADD += ${LIBJSON}
+endif
+
 if WITH_JSONLIB
 AM_CFLAGS += -I$(top_builddir)/json
 libchilli_la_LIBADD += $(top_builddir)/json/libjson.la 

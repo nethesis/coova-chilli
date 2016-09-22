@@ -1,15 +1,28 @@
+%define gitver .git20160819
+
 Summary:   Coova-Chilli is a Wireless LAN Access Point Controller
 Name:      coova-chilli
-Version:   1.3.1.3
+Version:   1.3.1.5.1%{?gitver}
 Release:   1%{?dist}
 URL:       http://coova.github.io/
 Source0:   %{name}-%{version}.tar.gz
+Source111: coova-chilli-sysconfig
+Source112: coova-chilli-ipup.sh
 License:   GPL
 Group:     System Environment/Daemons
+
+# Needed for sh bootstrap, build phase
+BuildRequires: autoconf automake libtool
 
 %if %{!?_without_ssl:1}0
 BuildRequires: openssl-devel libtool gengetopt
 %endif
+
+#%if 0%{?rhel} >= 7
+# In RH7, json-c is in a stock rpm
+Requires: json-c
+BuildRequires: json-c-devel
+#%endif
 
 %description
 
@@ -33,8 +46,11 @@ sh bootstrap
 	--enable-chilliredir \
 	--enable-chilliproxy \
         --enable-chilliscript \
+	--enable-ipwhitelist \
 	--with-poll \
-    --enable-libjson \
+%if 0%{?rhel} >= 7
+    --with-json \
+%endif
 %if %{!?_without_ssl:1}0
 	--with-openssl \
 	--enable-chilliradsec \
@@ -50,6 +66,16 @@ rm -rf $RPM_BUILD_ROOT%{_prefix}/include/*
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 #cp -f chilli $RPM_BUILD_ROOT%{_sysconfdir}/init.d/chilli
+
+# Place a default config file to be edited by the admin
+cp -p $RPM_BUILD_ROOT%{_sysconfdir}/chilli/defaults $RPM_BUILD_ROOT%{_sysconfdir}/chilli/config
+# throw away the initial comments telling to copy the defaults to config
+perl -ni -e '1 .. /^\s*$/ and /^#/ or print' $RPM_BUILD_ROOT%{_sysconfdir}/chilli/config
+perl -ni -e '1 ... /^\S/ and /^\s*$/ or print' $RPM_BUILD_ROOT%{_sysconfdir}/chilli/config
+
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+cp %{SOURCE111} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/chilli
+cp %{SOURCE112} $RPM_BUILD_ROOT%{_sysconfdir}/chilli/ipup.sh
 
 %check
 rm -f $RPM_BUILD_ROOT%{_libdir}/python/*.pyc
@@ -75,18 +101,21 @@ fi
 %{_libdir}/python/CoovaChilliLib.py
 %{_sysconfdir}/init.d/chilli
 %doc AUTHORS COPYING ChangeLog INSTALL README doc/dictionary.coovachilli doc/hotspotlogin.cgi
+%doc doc/fmttxt.pl doc/attributes doc/chilli.conf doc/firewall.* doc/freeradius.users doc/hotspotlogin* doc/*.php
 %config %{_sysconfdir}/chilli.conf
 %config %{_sysconfdir}/chilli/gui-config-default.ini
 %config(noreplace) %{_sysconfdir}/chilli/defaults
+%config(noreplace) %{_sysconfdir}/chilli/config
 %dir %{_sysconfdir}/chilli
 %dir %{_sysconfdir}/chilli/www
-%attr(755,root,root)%{_sysconfdir}/chilli/www/config.sh
+%config(noreplace) %attr(755,root,root)%{_sysconfdir}/chilli/www/config.sh
+%config(noreplace) %{_sysconfdir}/sysconfig/chilli
 %attr(4750,root,root)%{_sbindir}/chilli_script
-%{_sysconfdir}/chilli/www/*
+%config(noreplace) %{_sysconfdir}/chilli/www/*
 %{_sysconfdir}/chilli/wwwsh
-%{_sysconfdir}/chilli/functions
-%{_sysconfdir}/chilli/*.sh
-%{_sysconfdir}/chilli/wpad.dat
+%config(noreplace) %{_sysconfdir}/chilli/functions
+%config(noreplace) %{_sysconfdir}/chilli/*.sh
+%config(noreplace) %{_sysconfdir}/chilli/wpad.dat
 %{_mandir}/man1/*.1*
 %{_mandir}/man5/*.5*
 %{_mandir}/man8/*.8*

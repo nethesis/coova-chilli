@@ -724,6 +724,20 @@ if test x"$enable_ewtapi" = xyes; then
    AC_DEFINE(ENABLE_EWTAPI,1,[Define to enable CoovaEWT API])
 fi
 
+LIBJSON=
+AS_IF([test "x$with_json" != "xno"],
+      [AC_CHECK_LIB([json-c], [json_object_new_string],
+	      	    [AC_SUBST([LIBJSON], ["-ljson-c"])
+        	     AC_DEFINE([HAVEJSON], [1], [Define if you have libjson-c i(aka libjson0, libjson)])
+       	            ],
+       	            [AC_MSG_FAILURE([libjson test failed (install json-c or use --enable-json to build it here)])],
+                    [-ljson]
+		   )
+      ]
+     ) 
+
+AM_CONDITIONAL([WITH_JSON], [ test x$with_json != xno])
+
 AC_ARG_ENABLE(libjson, [AS_HELP_STRING([--enable-libjson],[Enable support for libjson])], 
   enable_libjson=$enableval, enable_libjson=no)
 

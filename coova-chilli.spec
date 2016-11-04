@@ -35,6 +35,7 @@ sh bootstrap
         --enable-chilliscript \
 	--with-poll \
     --enable-libjson \
+    --libdir=%{_libdir}/%{name} \
 %if %{!?_without_ssl:1}0
 	--with-openssl \
 	--enable-chilliradsec \
@@ -71,8 +72,7 @@ fi
 %files
 %defattr(-,root,root)
 %{_sbindir}/*
-%{_libdir}/*.so*
-%{_libdir}/python/CoovaChilliLib.py
+%{_libdir}/%{name}/*
 %{_sysconfdir}/init.d/chilli
 %doc AUTHORS COPYING ChangeLog INSTALL README doc/dictionary.chillispot doc/hotspotlogin.cgi
 %config %{_sysconfdir}/chilli.conf
@@ -92,6 +92,9 @@ fi
 %{_mandir}/man8/*.8*
 
 %changelog
+* Fri Nov 04 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.3.1.5-1
+- First release for NS7
+
 * Tue Mar 15 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.3.1.5-1
 - CoovaChilli does not start at init - Bug #3364 [NethServer]
 
